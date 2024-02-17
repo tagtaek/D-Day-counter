@@ -3,35 +3,8 @@
   <head>
     <title>D-Day</title>
     <link rel="stylesheet" href="./style.css" />
-    <script>
-      const dateFormMaker = () => {
-        const inputYear = document.querySelector("#target-year-input").value;
-        const inputMonth = document.querySelector("#target-month-input").value;
-        const inputDate = document.querySelector("#target-date-input").value;
-
-        // const dateFormat = inputYear + '-' + inputMonth + '-' + inputDate;
-        const dateFormat = `${inputYear}-${inputMonth}-${inputDate}`;
-        //템플릿 리터럴
-        //hi
-        return dateFormat;
-        // console.log(inputYear, inputMonth, inputDate);
-      };
-
-      const counterMaker = function () {
-        const targetDateInput = dateFormMaker();
-        const nowDate = new Date();
-        const targetDate = new Date(targetDateInput).setHours(0, 0, 0, 0);
-        //ms로 출력되기 때문에 1000으로 나눠줘야함dd
-        const remaining = (targetDate - nowDate) / 1000;
-
-        const remainingDate = Math.floor(remaining / 3600 / 24);
-        const remainingHours = Math.floor(remaining / 3600) % 24;
-        const remainingMin = Math.floor(remaining / 60) % 60;
-        const remainingSec = Math.floor(remaining) % 60;
-
-        console.log(remainingDate, remainingHours, remainingMin, remainingSec);
-      };
-    </script>
+    <!-- defer속성은, script태그를 해석하는 동시에 html 태그들도 생성하도록 해준다 -->
+    <script src="./script.js" defer></script>
   </head>
   <body>
     <h1>D-Day</h1>
@@ -53,11 +26,15 @@
         <span>초</span>
       </div>
     </div>
+    <div id="d-day-message"></div>
     <div id="target-selector">
       <input id="target-year-input" class="target-input" size="5" /> -
       <input id="target-month-input" class="target-input" size="5" /> -
       <input id="target-date-input" class="target-input" size="5" />
     </div>
     <button id="start-btn" onclick="counterMaker()">카운트다운 시작</button>
+    <!-- script태그가 꼭 헤드 태그에 있어야 하는건 아니다
+    <script src="./script.js"></script>
+    -->
   </body>
 </html>
