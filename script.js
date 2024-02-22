@@ -78,10 +78,7 @@ const counterMaker = function () {
 const starter = function () {
   container.style.display = "flex"; // none -> flex
   messageContainer.style.display = "none";
-  for (let i = 0; i < 100; i++) {
-    setTimeout(() => {
-      counterMaker();
-    }, 1000 * i); //for문이 한번에 돌아가지만, 1~100초까지 예약해놓은 느낌?
-  }
-  counterMaker();
+  counterMaker(); // setinterval이 '1초뒤에'실행되기 때문에 한번 실행시켜줌
+  setInterval(counterMaker, 1000);
+  //괄호안에는, 함수가 정의되어있을경우 참조만 전달/ 아닐경우 익명함수 작성
 };
