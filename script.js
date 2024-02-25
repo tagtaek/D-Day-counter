@@ -1,8 +1,9 @@
 const messageContainer = document.querySelector("#d-day-message");
 const container = document.querySelector("#d-day-container");
+const savedDate = localStorage.getItem("saved-date");
+console.log(savedDate);
 
-container.style.display = "none";
-messageContainer.innerHTML = "<h3>D-Day를 입력해 주세요.</h3>";
+const intervalIdArr = [];
 
 const dateFormMaker = () => {
   const inputYear = document.querySelector("#target-year-input").value;
@@ -17,10 +18,12 @@ const dateFormMaker = () => {
   // console.log(inputYear, inputMonth, inputDate);
 };
 
-const counterMaker = function () {
-  const targetDateInput = dateFormMaker();
+const counterMaker = function (data) {
+  if (data !== savedDate) {
+  }
+  localStorage.setItem("saved-date", data);
   const nowDate = new Date();
-  const targetDate = new Date(targetDateInput).setHours(0, 0, 0, 0);
+  const targetDate = new Date(data).setHours(0, 0, 0, 0);
   //ms로 출력되기 때문에 1000으로 나눠줘야함
   const remaining = (targetDate - nowDate) / 1000;
   //remaining 이 0 아래라면, 타이머가 종료되었습니다 출력
@@ -28,6 +31,7 @@ const counterMaker = function () {
     container.style.display = "none";
     messageContainer.innerHTML = "<h3>타이머가 종료되었습니다.</h3>";
     messageContainer.style.display = "flex";
+    setClearInterval();
     //잘못된 값이 들어오면 아래 계산하는 코드를 실행시킬 필요없기 때문에 종료시켜준다.
     return;
   } else if (isNaN(remaining)) {
@@ -36,6 +40,7 @@ const counterMaker = function () {
     container.style.display = "none";
     messageContainer.innerHTML = "<h3>유효한 시간대가 아닙니다.</h3>";
     messageContainer.style.display = "flex";
+    setClearInterval();
     //잘못된 값이 들어오면 아래 계산하는 코드를 실행시킬 필요없기 때문에 종료시켜준다.
     return;
   }
@@ -50,10 +55,19 @@ const counterMaker = function () {
   const documentArr = ["days", "hours", "min", "sec"];
   const timeKeys = Object.keys(remainingObj);
 
+  const format = function (time) {
+    if (time < 10) {
+      return "0" + time;
+    } else {
+      return time;
+    }
+  };
+
   let i = 0;
   for (let tag of documentArr) {
+    const remainingTime = format(remainingObj[timeKeys[i]]);
     //배열에서 쓰는 for-of 문
-    document.getElementById(tag).textContent = remainingObj[timeKeys[i]];
+    document.getElementById(tag).textContent = remainingTime;
     i++;
   }
   /*
@@ -75,10 +89,43 @@ const counterMaker = function () {
 */
 };
 
-const starter = function () {
+const starter = function (targetDateInput) {
+  if (!targetDateInput) {
+    targetDateInput = dateFormMaker();
+  }
   container.style.display = "flex"; // none -> flex
   messageContainer.style.display = "none";
-  counterMaker(); // setinterval이 '1초뒤에'실행되기 때문에 한번 실행시켜줌
-  setInterval(counterMaker, 1000);
-  //괄호안에는, 함수가 정의되어있을경우 참조만 전달/ 아닐경우 익명함수 작성
+  setClearInterval();
+
+  counterMaker(targetDateInput); // setinterval이 '1초뒤에'실행되기 때문에 한번 실행시켜줌
+
+  //intervalId에 인터벌ID를 담는동시에 setInterval() 함수 호출
+  const intervalId = setInterval(() => {
+    counterMaker(targetDateInput);
+  }, 1000); //인자가 있는 함수를 setInterval 안세서 쓰려면, 익명화살표함수 사용
+  intervalIdArr.push(intervalId);
 };
+
+const setClearInterval = function () {
+  localStorage.removeItem("saved-date");
+  for (let i = 0; i < intervalIdArr.length; i++) {
+    clearInterval(intervalIdArr[i]);
+    //인터벌id에 해당하는 인터벌을 삭제하는 것이지, 배열요소를 삭제하는 것이 아님.
+  }
+};
+
+const resetTimer = function () {
+  container.style.display = "none";
+  messageContainer.innerHTML = "<h3>D-Day를 입력해 주세요.</h3>";
+  messageContainer.style.display = "flex";
+  setClearInterval();
+};
+
+if (savedDate) {
+  //괄호 안이 truthy한 경우에도 실행됨
+  //falsy: undefined, null, 0 , "", NaN
+  starter(savedDate);
+} else {
+  container.style.display = "none";
+  messageContainer.innerHTML = "<h3>D-Day를 입력해 주세요.</h3>";
+}
